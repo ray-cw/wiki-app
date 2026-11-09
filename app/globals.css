@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbf8f2;
+  --foreground: #1f1a14;
+  --muted: #6b6155;
+  --gm-bg: #fdf0e1;
+  --gm-border: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #14120f;
+    --foreground: #ece6dc;
+    --muted: #a3998b;
+    --gm-bg: #2a1f12;
+    --gm-border: #d97706;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.gm-badge {
+  margin-left: 0.5rem;
+  border: 1px solid var(--gm-border);
+  border-radius: 0.25rem;
+  padding: 0 0.35rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  vertical-align: middle;
+  color: var(--gm-border);
+}
+
+.prose { line-height: 1.7; }
+.prose > * + * { margin-top: 1em; }
+.prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.75em; }
+.prose h3 { font-size: 1.2rem; font-weight: 600; margin-top: 1.5em; }
+.prose a { text-decoration: underline; }
+.prose ul { list-style: disc; padding-left: 1.5rem; }
+.prose ol { list-style: decimal; padding-left: 1.5rem; }
+.prose blockquote { border-left: 3px solid var(--muted); padding-left: 1rem; color: var(--muted); }
+.prose code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+
+.gm-only {
+  border-left: 4px solid var(--gm-border);
+  background: var(--gm-bg);
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+}
+.gm-only::before {
+  content: "GM only";
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--gm-border);
+}
