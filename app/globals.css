@@ -123,7 +123,8 @@
   }
 
   .sidebar {
-    @apply border-y-3 border-sidebar-rule bg-sidebar-bg px-5 py-4 font-sans text-base shadow-sm;
+    /* flow-root: sit beside an infobox instead of running underneath it. */
+    @apply flow-root border-y-3 border-sidebar-rule bg-sidebar-bg px-5 py-4 font-sans text-base shadow-sm;
   }
   .sidebar > * + * {
     @apply mt-3;
@@ -137,7 +138,7 @@
   }
 
   .gm-only {
-    @apply rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3 font-sans text-base;
+    @apply flow-root rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3 font-sans text-base;
   }
   .gm-only > * + * {
     @apply mt-3;

@@ -38,7 +38,40 @@ export type PageMeta = {
   order?: number;
   /** Guild color pair from the `colors` frontmatter, e.g. ["green", "white"]. */
   colors?: [ManaColor, ManaColor];
+  infobox?: Infobox;
 };
+
+/**
+ * Wiki-style fact box from the `infobox` frontmatter:
+ *   infobox:
+ *     image: banners/izzet.jpg
+ *     caption: optional text under the image
+ *     fields:
+ *       Parun: Niv-Mizzet
+ *       Guildhall: "[Nivix](/wiki/places/nivix)"
+ * Field values are inline Markdown, rendered to HTML here; empty ones are null.
+ */
+export type Infobox = {
+  image?: string;
+  caption?: string;
+  fields: { label: string; html: string | null }[];
+};
+
+function parseInfobox(slug: string, value: unknown) {
+  if (!value || typeof value !== "object") return { infobox: undefined, imagePath: null };
+  const { image, caption, fields } = value as Record<string, unknown>;
+  const imagePath = typeof image === "string" ? resolveImage(slug, image) : null;
+  const inline = new Marked();
+  const infobox: Infobox = {
+    image: imagePath ? mediaUrl(imagePath) : undefined,
+    caption: typeof caption === "string" ? caption : undefined,
+    fields: Object.entries(fields && typeof fields === "object" ? fields : {}).map(([label, raw]) => ({
+      label,
+      html: raw == null || raw === "" ? null : (inline.parseInline(String(raw)) as string),
+    })),
+  };
+  return { infobox, imagePath };
+}
 
 const MANA_COLORS = ["white", "blue", "black", "red", "green"] as const;
 export type ManaColor = (typeof MANA_COLORS)[number];
@@ -82,6 +115,7 @@ async function loadAll() {
         .split(path.sep)
         .join("/");
       const iconPath = typeof data.icon === "string" ? resolveImage(slug, data.icon) : null;
+      const { infobox, imagePath: infoboxImagePath } = parseInfobox(slug, data.infobox);
       const meta: PageMeta = {
         slug,
         title: typeof data.title === "string" ? data.title : slug,
@@ -89,8 +123,11 @@ async function loadAll() {
         icon: iconPath ? mediaUrl(iconPath) : undefined,
         order: typeof data.order === "number" ? data.order : undefined,
         colors: parseColors(data.colors),
+        infobox,
       };
-      return { meta, content, iconPath };
+      // Images named in frontmatter rather than the page body.
+      const frontmatterImages = [iconPath, infoboxImagePath].filter((p): p is string => Boolean(p));
+      return { meta, content, frontmatterImages };
     }),
   );
 }
@@ -230,7 +267,7 @@ async function canViewImage(role: Role, imagePath: string) {
   if (role === "gm") return true;
   for (const page of await loadAll()) {
     if (!canSee(role, page.meta.visibility)) continue;
-    if (page.iconPath === imagePath) return true;
+    if (page.frontmatterImages.includes(imagePath)) return true;
     const { images } = await render(page.meta.slug, visibleMarkdown(role, page.content));
     if (images.has(imagePath)) return true;
   }
