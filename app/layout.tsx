@@ -6,7 +6,7 @@ import { beleren, crimsonPro, scalySans } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Campaign Wiki",
+  title: "Ravnica: Welcome to the Show",
   robots: { index: false, follow: false },
 };
 
