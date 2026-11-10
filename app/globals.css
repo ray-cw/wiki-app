@@ -7,6 +7,8 @@
   --gm-bg: #fdf0e1;
   --gm-border: #b45309;
   --table-stripe: #efe7d8;
+  --sidebar-bg: #ebe3cc;
+  --sidebar-rule: #8a7654;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +19,8 @@
     --gm-bg: #2a1f12;
     --gm-border: #d97706;
     --table-stripe: #221e18;
+    --sidebar-bg: #211d17;
+    --sidebar-rule: #7a6848;
   }
 }
 
@@ -28,6 +32,8 @@
   --color-gm-bg: var(--gm-bg);
   --color-gm-border: var(--gm-border);
   --color-table-stripe: var(--table-stripe);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-rule: var(--sidebar-rule);
 
   /* Set by next/font in app/fonts.ts. */
   --font-heading: var(--font-beleren);
@@ -116,8 +122,25 @@
     @apply bg-table-stripe;
   }
 
+  .sidebar {
+    @apply border-y-3 border-sidebar-rule bg-sidebar-bg px-5 py-4 font-sans text-base shadow-sm;
+  }
+  .sidebar > * + * {
+    @apply mt-3;
+  }
+  .sidebar-title {
+    @apply text-lg font-bold tracking-wide;
+  }
+  /* The page stripe is too close to the sidebar's own background. */
+  .prose .sidebar tbody tr:nth-child(odd) {
+    @apply bg-sidebar-rule/20;
+  }
+
   .gm-only {
     @apply rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3 font-sans text-base;
+  }
+  .gm-only > * + * {
+    @apply mt-3;
   }
   .gm-only::before {
     @apply block text-xs font-bold tracking-wider text-gm-border uppercase;

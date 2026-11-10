@@ -18,11 +18,16 @@ const IMAGE_TYPES: Record<string, string> = {
   ".webp": "image/webp",
 };
 
-// Inline GM-only sections:
-//   :::gm
+// Fenced blocks, which can nest:
+//   :::sidebar Tavern Rumors      boxed text everyone sees; the title is optional
+//   The ale is watered down.
+//   :::gm                         GM-only section
 //   The innkeeper is secretly a dragon.
 //   :::
-const GM_BLOCK = /^:::gm[ \t]*\r?\n([\s\S]*?)\r?\n:::[ \t]*$/gm;
+//   :::
+const BLOCK_OPEN = /^:::(gm|sidebar)(?:[ \t]+(.*?))?[ \t]*$/;
+const BLOCK_CLOSE = /^:::[ \t]*$/;
+const CODE_FENCE = /^ {0,3}(```|~~~)/;
 
 export type PageMeta = {
   slug: string;
@@ -105,11 +110,54 @@ export async function listGuilds(role: Role): Promise<PageMeta[]> {
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 }
 
-// GM sections are removed here, on the server, so players never receive them.
+function escapeHtml(text: string) {
+  return text.replace(/[&<>"]/g, (c) => `&${{ "&": "amp", "<": "lt", ">": "gt", '"': "quot" }[c]};`);
+}
+
+/**
+ * Turns :::gm and :::sidebar blocks into HTML wrappers. GM sections are
+ * removed here, on the server, so players never receive them. An unclosed
+ * GM block hides everything after it rather than leaking it.
+ */
 function visibleMarkdown(role: Role, content: string) {
-  return content.replace(GM_BLOCK, (_, inner: string) =>
-    role === "gm" ? `<div class="gm-only">\n\n${inner}\n\n</div>` : "",
-  );
+  const out: string[] = [];
+  const open: { tag: string; hidden: boolean }[] = [];
+  let inCode = false;
+
+  for (const line of content.split(/\r?\n/)) {
+    const hidden = open.at(-1)?.hidden ?? false;
+    if (CODE_FENCE.test(line)) inCode = !inCode;
+
+    const opening = inCode ? null : BLOCK_OPEN.exec(line);
+    if (opening) {
+      const [, kind, title] = opening;
+      if (hidden || (kind === "gm" && role !== "gm")) {
+        open.push({ tag: "", hidden: true });
+      } else if (kind === "gm") {
+        open.push({ tag: "div", hidden: false });
+        out.push('<div class="gm-only">', "");
+      } else {
+        open.push({ tag: "aside", hidden: false });
+        out.push('<aside class="sidebar">', "");
+        if (title) out.push(`<p class="sidebar-title">${escapeHtml(title)}</p>`, "");
+      }
+      continue;
+    }
+
+    if (!inCode && open.length > 0 && BLOCK_CLOSE.test(line)) {
+      const block = open.pop()!;
+      if (!block.hidden) out.push("", `</${block.tag}>`, "");
+      continue;
+    }
+
+    if (!hidden) out.push(line);
+  }
+
+  // Close any visible blocks the author left open.
+  for (const block of open.reverse()) {
+    if (!block.hidden) out.push("", `</${block.tag}>`);
+  }
+  return out.join("\n");
 }
 
 /**
