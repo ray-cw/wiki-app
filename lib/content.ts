@@ -1,4 +1,5 @@
 import "server-only";
+import { statSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
@@ -129,8 +130,19 @@ function resolveImage(slug: string, href: string) {
   return path.posix.normalize(path.posix.join(base, target)).slice(1);
 }
 
+/**
+ * /media URL for an image, with ?v= changing whenever the file does (and on
+ * every deploy, since the content is freshly cloned), so browsers can cache
+ * it for a long time yet never show a stale image.
+ */
 function mediaUrl(imagePath: string) {
-  return `/media/${imagePath.split("/").map(encodeURIComponent).join("/")}`;
+  const url = `/media/${imagePath.split("/").map(encodeURIComponent).join("/")}`;
+  try {
+    const { mtimeMs, size } = statSync(path.join(PAGES_DIR, imagePath));
+    return `${url}?v=${Math.floor(mtimeMs).toString(36)}${size.toString(36)}`;
+  } catch {
+    return url;
+  }
 }
 
 /** Renders markdown, pointing local images at /media and listing them. */
