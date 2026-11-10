@@ -6,7 +6,7 @@ export default async function LoginPage() {
   if (await getRole()) redirect("/");
   return (
     <main className="mx-auto mt-24 w-full max-w-sm px-4">
-      <h1 className="mb-6 text-2xl font-semibold">Campaign Wiki</h1>
+      <h1 className="mb-6 text-2xl">Campaign Wiki</h1>
       <LoginForm />
     </main>
   );

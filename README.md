@@ -24,3 +24,11 @@ npm run dev
 4. Under **Settings → Git → Deploy Hooks**, create a hook for `main` and save its URL as the `VERCEL_DEPLOY_HOOK` secret in `wiki-content`. Pushing content then redeploys the site.
 
 `npm run build` runs `scripts/fetch-content.mjs` first, which clones the content repo into `./content` (git-ignored).
+
+## Fonts
+
+Loaded in `app/fonts.ts` and self-hosted by `next/font`; no font files are committed here.
+
+- **Headings:** Beleren Bold, via [`@saeris/typeface-beleren-bold`](https://github.com/Saeris/typeface-beleren-bold). Beleren is © Wizards of the Coast; this is a non-commercial fan site.
+- **Body:** [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) by Jacques Le Bailly, SIL Open Font License.
+- **Tables and sidebars:** Scaly Sans from Solbera's D&D 5e fonts, with fixes by Ryrok, Ners and others, via [`solbera-dnd-fonts`](https://github.com/prantlf/solbera-dnd-fonts). Licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).

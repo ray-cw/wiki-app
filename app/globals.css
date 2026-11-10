@@ -6,6 +6,7 @@
   --muted: #6b6155;
   --gm-bg: #fdf0e1;
   --gm-border: #b45309;
+  --table-stripe: #efe7d8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,6 +16,7 @@
     --muted: #a3998b;
     --gm-bg: #2a1f12;
     --gm-border: #d97706;
+    --table-stripe: #221e18;
   }
 }
 
@@ -25,11 +27,15 @@
   --color-muted: var(--muted);
   --color-gm-bg: var(--gm-bg);
   --color-gm-border: var(--gm-border);
+  --color-table-stripe: var(--table-stripe);
+
+  /* Set by next/font in app/fonts.ts. */
+  --font-heading: var(--font-beleren);
+  --font-serif: var(--font-crimson-pro), Georgia, serif;
+  --font-sans: var(--font-scaly-sans), system-ui, sans-serif;
 }
 
 @theme {
-  --font-serif: Georgia, "Times New Roman", serif;
-
   /* Guild emblems always sit on dark discs, like the white-on-black guild wheel. */
   --color-disc: #121110;
   --color-disc-ring: #b9b2a6;
@@ -50,7 +56,13 @@
 
 @layer base {
   body {
-    @apply bg-background font-serif text-foreground;
+    @apply bg-background font-serif text-lg text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading font-bold;
   }
 }
 
@@ -63,10 +75,10 @@
     @apply mt-4;
   }
   .prose h2 {
-    @apply mt-7 text-2xl font-semibold;
+    @apply mt-7 text-2xl;
   }
   .prose h3 {
-    @apply mt-6 text-xl font-semibold;
+    @apply mt-6 text-xl;
   }
   .prose a {
     @apply underline;
@@ -87,11 +99,28 @@
     @apply h-auto max-w-full rounded;
   }
 
+  /* Tables and sidebars use Scaly Sans, like the D&D rulebooks. */
+  .prose .table-scroll {
+    @apply overflow-x-auto;
+  }
+  .prose table {
+    @apply w-full font-sans text-base;
+  }
+  .prose th {
+    @apply px-3 py-1.5 text-left font-bold;
+  }
+  .prose td {
+    @apply px-3 py-1.5 align-top;
+  }
+  .prose tbody tr:nth-child(odd) {
+    @apply bg-table-stripe;
+  }
+
   .gm-only {
-    @apply rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3;
+    @apply rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3 font-sans text-base;
   }
   .gm-only::before {
-    @apply block font-sans text-xs font-semibold text-gm-border uppercase;
+    @apply block text-xs font-bold tracking-wider text-gm-border uppercase;
     content: "GM only";
   }
 }

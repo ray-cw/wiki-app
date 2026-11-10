@@ -156,6 +156,11 @@ async function render(slug: string, markdown: string) {
       images.add(imagePath);
       token.href = mediaUrl(imagePath);
     },
+    hooks: {
+      // Wide tables scroll inside this wrapper instead of widening the page.
+      postprocess: (html) =>
+        html.replaceAll("<table>", '<div class="table-scroll"><table>').replaceAll("</table>", "</table></div>"),
+    },
   });
   return { html: await parser.parse(markdown), images };
 }

@@ -54,7 +54,7 @@ export function GuildWheel({ guilds }: { guilds: Guild[] }) {
         className="group/center absolute top-1/2 left-1/2 flex aspect-square w-[46%] -translate-1/2 flex-col items-center justify-center gap-1.5 rounded-full bg-disc p-[10%] text-center text-disc-text ring-2 ring-disc-ring ring-offset-3 ring-offset-disc"
       >
         <span
-          className={`text-[clamp(1.1rem,4.5vw,2rem)] leading-tight font-semibold ${
+          className={`font-heading text-[clamp(1.1rem,4.5vw,2rem)] leading-tight ${
             active ? "bg-linear-135 from-(--from) to-(--to) bg-clip-text text-transparent" : ""
           }`}
         >

@@ -16,7 +16,7 @@ export default async function WikiPage({ params }: PageProps<"/wiki/[...slug]">)
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="mb-6 flex items-center gap-5 text-3xl font-semibold">
+      <h1 className="mb-6 flex items-center gap-5 text-3xl">
         {page.meta.icon && (
           <span className="group relative size-14 flex-none" style={guildColorVars(page.meta.colors)}>
             <GuildDisc icon={page.meta.icon} lit={Boolean(page.meta.colors)} />
