@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <main className="flex w-full flex-1 items-center justify-center px-4 py-8">
       <GuildWheel
-        guilds={guilds.map(({ slug, title, icon }) => ({ slug, title, icon: icon! }))}
+        guilds={guilds.map(({ slug, title, icon, colors }) => ({ slug, title, icon: icon!, colors }))}
       />
     </main>
   );

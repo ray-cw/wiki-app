@@ -30,7 +30,19 @@ export type PageMeta = {
   /** /media URL of the `icon` frontmatter image, e.g. a guild logo. */
   icon?: string;
   order?: number;
+  /** Guild color pair from the `colors` frontmatter, e.g. ["green", "white"]. */
+  colors?: [ManaColor, ManaColor];
 };
+
+const MANA_COLORS = ["white", "blue", "black", "red", "green"] as const;
+export type ManaColor = (typeof MANA_COLORS)[number];
+
+function parseColors(value: unknown): PageMeta["colors"] {
+  if (!Array.isArray(value)) return undefined;
+  const colors = value.filter((c): c is ManaColor => MANA_COLORS.includes(c));
+  if (colors.length === 0) return undefined;
+  return [colors[0], colors[1] ?? colors[0]];
+}
 
 function canSee(role: Role, visibility: Role) {
   return role === "gm" || visibility === "player";
@@ -70,6 +82,7 @@ async function loadAll() {
         visibility: data.visibility === "gm" ? "gm" : "player",
         icon: iconPath ? mediaUrl(iconPath) : undefined,
         order: typeof data.order === "number" ? data.order : undefined,
+        colors: parseColors(data.colors),
       };
       return { meta, content, iconPath };
     }),

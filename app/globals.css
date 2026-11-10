@@ -6,11 +6,6 @@
   --muted: #6b6155;
   --gm-bg: #fdf0e1;
   --gm-border: #b45309;
-  /* Guild emblems always sit on dark discs, like the white-on-black guild wheel. */
-  --disc: #121110;
-  --disc-ring: #b9b2a6;
-  --disc-text: #ece6dc;
-  --glow: #e0b866;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,152 +18,80 @@
   }
 }
 
+/* Light/dark tokens, e.g. bg-background, text-muted, border-gm-border. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-gm-bg: var(--gm-bg);
+  --color-gm-border: var(--gm-border);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Georgia, "Times New Roman", serif;
+@theme {
+  --font-serif: Georgia, "Times New Roman", serif;
+
+  /* Guild emblems always sit on dark discs, like the white-on-black guild wheel. */
+  --color-disc: #121110;
+  --color-disc-ring: #b9b2a6;
+  --color-disc-text: #ece6dc;
+  --color-glow: #e0b866;
 }
 
-.gm-badge {
-  margin-left: 0.5rem;
-  border: 1px solid var(--gm-border);
-  border-radius: 0.25rem;
-  padding: 0 0.35rem;
-  font-family: system-ui, sans-serif;
-  font-size: 0.7rem;
-  vertical-align: middle;
-  color: var(--gm-border);
+/* Mana colors for guild gradients, tuned to glow against the dark discs.
+   Black is a deep violet: true black wouldn't show as a glow. `static` keeps
+   them in the CSS even though only guild-colors.ts refers to them. */
+@theme static {
+  --color-mana-white: #f3e3b5;
+  --color-mana-blue: #2e8de6;
+  --color-mana-black: #7d4bb3;
+  --color-mana-red: #e5432d;
+  --color-mana-green: #26a65b;
 }
 
-.prose { line-height: 1.7; }
-.prose > * + * { margin-top: 1em; }
-.prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.75em; }
-.prose h3 { font-size: 1.2rem; font-weight: 600; margin-top: 1.5em; }
-.prose a { text-decoration: underline; }
-.prose ul { list-style: disc; padding-left: 1.5rem; }
-.prose ol { list-style: decimal; padding-left: 1.5rem; }
-.prose blockquote { border-left: 3px solid var(--muted); padding-left: 1rem; color: var(--muted); }
-.prose code { font-family: ui-monospace, monospace; font-size: 0.9em; }
-.prose img { max-width: 100%; height: auto; border-radius: 0.25rem; }
-
-.wheel {
-  position: relative;
-  width: min(100%, 640px);
-  aspect-ratio: 1;
-}
-/* Faint ring that the guild discs sit on. */
-.wheel::before {
-  content: "";
-  position: absolute;
-  inset: 11%;
-  border-radius: 50%;
-  border: 1px solid var(--disc-ring);
-  opacity: 0.35;
+@layer base {
+  body {
+    @apply bg-background font-serif text-foreground;
+  }
 }
 
-.wheel-guild {
-  position: absolute;
-  width: 19%;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--disc);
-  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--disc-ring);
-  transform: translate(-50%, -50%);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.wheel-guild img {
-  width: 70%;
-  height: 70%;
-  object-fit: contain;
-  opacity: 0.85;
-  transition: opacity 0.2s ease, filter 0.2s ease;
-}
-.wheel-guild:hover,
-.wheel-guild:focus-visible {
-  z-index: 1;
-  outline: none;
-  transform: translate(-50%, -50%) scale(1.12);
-  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--glow), 0 0 28px color-mix(in srgb, var(--glow) 55%, transparent);
-}
-.wheel-guild:hover img,
-.wheel-guild:focus-visible img {
-  opacity: 1;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--glow) 70%, transparent));
-}
+/* Styles for rendered Markdown, which can't carry utility classes itself. */
+@layer components {
+  .prose {
+    @apply leading-relaxed;
+  }
+  .prose > * + * {
+    @apply mt-4;
+  }
+  .prose h2 {
+    @apply mt-7 text-2xl font-semibold;
+  }
+  .prose h3 {
+    @apply mt-6 text-xl font-semibold;
+  }
+  .prose a {
+    @apply underline;
+  }
+  .prose ul {
+    @apply list-disc pl-6;
+  }
+  .prose ol {
+    @apply list-decimal pl-6;
+  }
+  .prose blockquote {
+    @apply border-l-3 border-muted pl-4 text-muted;
+  }
+  .prose code {
+    @apply font-mono text-[0.9em];
+  }
+  .prose img {
+    @apply h-auto max-w-full rounded;
+  }
 
-.wheel-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46%;
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 10%;
-  border-radius: 50%;
-  background: var(--disc);
-  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--disc-ring);
-  color: var(--disc-text);
-  text-align: center;
-  transform: translate(-50%, -50%);
-}
-.wheel-sunburst {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 56%;
-  transform: translate(-50%, -50%);
-  fill: var(--disc-ring);
-  opacity: 0.55;
-}
-.wheel-title {
-  font-size: clamp(1.1rem, 4.5vw, 2rem);
-  font-weight: 600;
-  line-height: 1.15;
-}
-.wheel-sub {
-  font-family: system-ui, sans-serif;
-  font-size: clamp(0.6rem, 2vw, 0.8rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--disc-ring);
-}
-.wheel-center:hover .wheel-sub { color: var(--glow); }
-
-.page-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  background: var(--disc);
-  box-shadow: 0 0 0 2px var(--disc), 0 0 0 3px var(--disc-ring);
-}
-.page-icon img { width: 66%; height: 66%; object-fit: contain; }
-
-.gm-only {
-  border-left: 4px solid var(--gm-border);
-  background: var(--gm-bg);
-  padding: 0.75rem 1rem;
-  border-radius: 0.25rem;
-}
-.gm-only::before {
-  content: "GM only";
-  display: block;
-  font-family: system-ui, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--gm-border);
+  .gm-only {
+    @apply rounded border-l-4 border-gm-border bg-gm-bg px-4 py-3;
+  }
+  .gm-only::before {
+    @apply block font-sans text-xs font-semibold text-gm-border uppercase;
+    content: "GM only";
+  }
 }

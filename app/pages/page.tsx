@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { listPages } from "@/lib/content";
 import { getRole } from "@/lib/session";
+import { GmBadge } from "../gm-badge";
 
 export default async function AllPages() {
   const role = await getRole();
@@ -20,7 +21,7 @@ export default async function AllPages() {
               <Link href={`/wiki/${page.slug}`} className="underline">
                 {page.title}
               </Link>
-              {page.visibility === "gm" && <span className="gm-badge">GM</span>}
+              {page.visibility === "gm" && <GmBadge />}
             </li>
           ))}
         </ul>
