@@ -9,9 +9,11 @@ A small campaign wiki with two logins: **Gamemaster** and **Player**. Pages are 
 
 ## Local development
 
+Clone `wiki-content` next to this repo, then link it in as `./content` so edits there show up straight away:
+
 ```bash
 cp .env.example .env.local          # fill in passwords and SESSION_SECRET
-git clone https://github.com/ray-cw/wiki-content content
+ln -s ../wiki-content content       # ../wiki-content is your clone of the content repo
 npm install
 npm run dev
 ```
