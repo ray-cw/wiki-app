@@ -27,6 +27,9 @@ export type PageMeta = {
   slug: string;
   title: string;
   visibility: Role;
+  /** /media URL of the `icon` frontmatter image, e.g. a guild logo. */
+  icon?: string;
+  order?: number;
 };
 
 function canSee(role: Role, visibility: Role) {
@@ -60,12 +63,15 @@ async function loadAll() {
         .replace(/\.md$/, "")
         .split(path.sep)
         .join("/");
+      const iconPath = typeof data.icon === "string" ? resolveImage(slug, data.icon) : null;
       const meta: PageMeta = {
         slug,
         title: typeof data.title === "string" ? data.title : slug,
         visibility: data.visibility === "gm" ? "gm" : "player",
+        icon: iconPath ? mediaUrl(iconPath) : undefined,
+        order: typeof data.order === "number" ? data.order : undefined,
       };
-      return { meta, content };
+      return { meta, content, iconPath };
     }),
   );
 }
@@ -76,6 +82,13 @@ export async function listPages(role: Role): Promise<PageMeta[]> {
     .map((page) => page.meta)
     .filter((meta) => canSee(role, meta.visibility))
     .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/** Guild pages with an icon, in `order`, for the landing page wheel. */
+export async function listGuilds(role: Role): Promise<PageMeta[]> {
+  return (await listPages(role))
+    .filter((meta) => meta.slug.startsWith("guilds/") && meta.icon)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 }
 
 // GM sections are removed here, on the server, so players never receive them.
@@ -139,6 +152,7 @@ async function canViewImage(role: Role, imagePath: string) {
   if (role === "gm") return true;
   for (const page of await loadAll()) {
     if (!canSee(role, page.meta.visibility)) continue;
+    if (page.iconPath === imagePath) return true;
     const { images } = await render(page.meta.slug, visibleMarkdown(role, page.content));
     if (images.has(imagePath)) return true;
   }

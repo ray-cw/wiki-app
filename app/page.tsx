@@ -1,30 +1,18 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { listPages } from "@/lib/content";
+import { listGuilds } from "@/lib/content";
 import { getRole } from "@/lib/session";
+import { GuildWheel } from "./guild-wheel";
 
 export default async function Home() {
   const role = await getRole();
   if (!role) redirect("/login");
-  const pages = await listPages(role);
+  const guilds = await listGuilds(role);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-semibold">Pages</h1>
-      {pages.length === 0 ? (
-        <p>No pages yet. Is the content folder fetched?</p>
-      ) : (
-        <ul className="space-y-2">
-          {pages.map((page) => (
-            <li key={page.slug}>
-              <Link href={`/wiki/${page.slug}`} className="underline">
-                {page.title}
-              </Link>
-              {page.visibility === "gm" && <span className="gm-badge">GM</span>}
-            </li>
-          ))}
-        </ul>
-      )}
+    <main className="flex w-full flex-1 items-center justify-center px-4 py-8">
+      <GuildWheel
+        guilds={guilds.map(({ slug, title, icon }) => ({ slug, title, icon: icon! }))}
+      />
     </main>
   );
 }

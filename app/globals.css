@@ -6,6 +6,11 @@
   --muted: #6b6155;
   --gm-bg: #fdf0e1;
   --gm-border: #b45309;
+  /* Guild emblems always sit on dark discs, like the white-on-black guild wheel. */
+  --disc: #121110;
+  --disc-ring: #b9b2a6;
+  --disc-text: #ece6dc;
+  --glow: #e0b866;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,6 +55,107 @@ body {
 .prose blockquote { border-left: 3px solid var(--muted); padding-left: 1rem; color: var(--muted); }
 .prose code { font-family: ui-monospace, monospace; font-size: 0.9em; }
 .prose img { max-width: 100%; height: auto; border-radius: 0.25rem; }
+
+.wheel {
+  position: relative;
+  width: min(100%, 640px);
+  aspect-ratio: 1;
+}
+/* Faint ring that the guild discs sit on. */
+.wheel::before {
+  content: "";
+  position: absolute;
+  inset: 11%;
+  border-radius: 50%;
+  border: 1px solid var(--disc-ring);
+  opacity: 0.35;
+}
+
+.wheel-guild {
+  position: absolute;
+  width: 19%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--disc);
+  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--disc-ring);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.wheel-guild img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+.wheel-guild:hover,
+.wheel-guild:focus-visible {
+  z-index: 1;
+  outline: none;
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--glow), 0 0 28px color-mix(in srgb, var(--glow) 55%, transparent);
+}
+.wheel-guild:hover img,
+.wheel-guild:focus-visible img {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--glow) 70%, transparent));
+}
+
+.wheel-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 10%;
+  border-radius: 50%;
+  background: var(--disc);
+  box-shadow: 0 0 0 3px var(--disc), 0 0 0 5px var(--disc-ring);
+  color: var(--disc-text);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.wheel-sunburst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56%;
+  transform: translate(-50%, -50%);
+  fill: var(--disc-ring);
+  opacity: 0.55;
+}
+.wheel-title {
+  font-size: clamp(1.1rem, 4.5vw, 2rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.wheel-sub {
+  font-family: system-ui, sans-serif;
+  font-size: clamp(0.6rem, 2vw, 0.8rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--disc-ring);
+}
+.wheel-center:hover .wheel-sub { color: var(--glow); }
+
+.page-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--disc);
+  box-shadow: 0 0 0 2px var(--disc), 0 0 0 3px var(--disc-ring);
+}
+.page-icon img { width: 66%; height: 66%; object-fit: contain; }
 
 .gm-only {
   border-left: 4px solid var(--gm-border);

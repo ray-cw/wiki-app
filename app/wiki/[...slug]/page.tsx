@@ -13,7 +13,13 @@ export default async function WikiPage({ params }: PageProps<"/wiki/[...slug]">)
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-semibold">
+      <h1 className="mb-6 flex items-center gap-4 text-3xl font-semibold">
+        {page.meta.icon && (
+          <span className="page-icon">
+            {/* eslint-disable-next-line @next/next/no-img-element -- served by our own /media route */}
+            <img src={page.meta.icon} alt="" />
+          </span>
+        )}
         {page.meta.title}
         {page.meta.visibility === "gm" && <span className="gm-badge">GM</span>}
       </h1>
