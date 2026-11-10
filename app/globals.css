@@ -49,6 +49,7 @@ body {
 .prose ol { list-style: decimal; padding-left: 1.5rem; }
 .prose blockquote { border-left: 3px solid var(--muted); padding-left: 1rem; color: var(--muted); }
 .prose code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+.prose img { max-width: 100%; height: auto; border-radius: 0.25rem; }
 
 .gm-only {
   border-left: 4px solid var(--gm-border);

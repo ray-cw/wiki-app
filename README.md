@@ -4,6 +4,7 @@ A small campaign wiki with two logins: **Gamemaster** and **Player**. Pages are 
 
 - Pages marked `visibility: gm` are hidden from players (they get a 404).
 - `:::gm … :::` blocks inside a page are stripped on the server for players.
+- Images live next to the pages and are served from `/media/…` behind the login. Players can only load images that appear in content they can see.
 - Every page is rendered per request; nothing GM-only is in static files or client JS.
 
 ## Local development
