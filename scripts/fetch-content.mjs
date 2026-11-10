@@ -5,7 +5,8 @@ import { existsSync, rmSync } from "node:fs";
 
 const DIR = "content";
 const repo = process.env.CONTENT_REPO ?? "ray-cw/wiki-content";
-const token = process.env.CONTENT_REPO_TOKEN;
+// Trim: values pasted into dashboards often pick up a trailing newline or space.
+const token = process.env.CONTENT_REPO_TOKEN?.trim();
 
 if (!token) {
   if (process.env.VERCEL) {
@@ -27,9 +28,11 @@ try {
     ["clone", "--depth=1", `https://x-access-token:${token}@github.com/${repo}.git`, DIR],
     { stdio: "pipe" },
   );
-} catch {
-  // Don't print git's output: it can echo the URL containing the token.
+} catch (error) {
+  // git's output can echo the URL containing the token, so redact it.
+  const detail = String(error.stderr || error.message).replaceAll(token, "***").trim();
   console.error(`Failed to clone ${repo}. Check CONTENT_REPO_TOKEN and CONTENT_REPO.`);
+  console.error(detail);
   process.exit(1);
 }
 // .git/config holds the token-bearing URL; drop it so nothing ships with it.
