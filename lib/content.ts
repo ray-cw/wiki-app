@@ -32,6 +32,7 @@ const CODE_FENCE = /^ {0,3}(```|~~~)/;
 export type PageMeta = {
   slug: string;
   title: string;
+  subtitle?: string;
   visibility: Role;
   /** /media URL of the `icon` frontmatter image, e.g. a guild logo. */
   icon?: string;
@@ -119,6 +120,7 @@ async function loadAll() {
       const meta: PageMeta = {
         slug,
         title: typeof data.title === "string" ? data.title : slug,
+        subtitle: typeof data.subtitle === "string" ? data.subtitle : undefined,
         visibility: data.visibility === "gm" ? "gm" : "player",
         icon: iconPath ? mediaUrl(iconPath) : undefined,
         order: typeof data.order === "number" ? data.order : undefined,
@@ -233,7 +235,22 @@ function mediaUrl(imagePath: string) {
 /** Renders markdown, pointing local images at /media and listing them. */
 async function render(slug: string, markdown: string) {
   const images = new Set<string>();
+  const headings: { id: string; title: string }[] = [];
+  const headingIds = new Set<string>();
   const parser = new Marked({
+    renderer: {
+      heading({ tokens, depth }) {
+        const html = this.parser.parseInline(tokens);
+        // Keep labels plain text; inline formatting still renders in the heading.
+        const title = html.replace(/<[^>]*>/g, "");
+        const base = title.toLowerCase().replace(/&[^;]+;/g, " ").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "section";
+        let id = base;
+        for (let suffix = 2; headingIds.has(id); suffix++) id = `${base}-${suffix}`;
+        headingIds.add(id);
+        if (depth === 2) headings.push({ id, title });
+        return `<h${depth} id="${id}">${html}</h${depth}>\n`;
+      },
+    },
     walkTokens(token) {
       if (token.type !== "image") return;
       const imagePath = resolveImage(slug, token.href);
@@ -243,8 +260,14 @@ async function render(slug: string, markdown: string) {
     },
     hooks: {
       // Wide tables scroll inside this wrapper instead of widening the page.
-      postprocess: (html) =>
-        html.replaceAll("<table>", '<div class="table-scroll"><table>').replaceAll("</table>", "</table></div>"),
+      postprocess(html) {
+        html = html.replaceAll("<table>", '<div class="table-scroll"><table>').replaceAll("</table>", "</table></div>");
+        if (headings.length < 2) return html;
+        const links = headings.map(({ id, title }) => `<li><a href="#${id}">${title}</a></li>`).join("");
+        const toc = `<nav class="wiki-toc" aria-label="Contents"><p class="wiki-toc-title">Contents</p><ol>${links}</ol></nav>\n`;
+        // Preserve the opening description, then place navigation before the sections.
+        return html.replace(/<h2\b/, `${toc}<h2`);
+      },
     },
   });
   return { html: await parser.parse(markdown), images };

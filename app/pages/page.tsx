@@ -4,6 +4,8 @@ import { listPages } from "@/lib/content";
 import { getRole } from "@/lib/session";
 import { GmBadge } from "../gm-badge";
 
+export const metadata = { title: "All Pages" };
+
 export default async function AllPages() {
   const role = await getRole();
   if (!role) redirect("/login");

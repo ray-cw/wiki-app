@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getRole } from "@/lib/session";
 import { LoginForm } from "./login-form";
 
+export const metadata = { title: "Log In" };
+
 export default async function LoginPage() {
   if (await getRole()) redirect("/");
   return (

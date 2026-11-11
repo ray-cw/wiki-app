@@ -6,7 +6,10 @@ import { beleren, crimsonPro, scalySans } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ravnica: Welcome to the Show",
+  title: {
+    default: "Ravnica: Welcome to the Show",
+    template: "%s | Ravnica",
+  },
   robots: { index: false, follow: false },
 };
 
